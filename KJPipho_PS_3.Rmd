@@ -1,0 +1,201 @@
+---
+title: "Untitled"
+author: "Krista Pipho"
+date: "September 21, 2018"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Question 1. Summary Statistics
+
+```{r}
+# First we open the "countries2005_groomed" data file and view the variabe names
+countries <- read.csv("C:\\Users\\xenon\\Desktop\\R Studio 2018\\countries2005_groomed.csv")
+
+names(countries)
+
+```
+
+Now we will generate summary statistics on various aspects of the data, including an arument that allows for numerical analysis dispite the presence of NA values
+
+```{r}
+#This portion calculates the summary values for all variables and stores them
+
+mean_life = mean(countries$Life_expectancy_at_birth_total_years,na.rm=TRUE)
+median_life = median(countries$Life_expectancy_at_birth_total_years,na.rm=TRUE)
+sd_life = sd(countries$Life_expectancy_at_birth_total_years,na.rm=TRUE)
+
+mean_mlife = mean(countries$Life_expectancy_at_birth_male_years,na.rm=TRUE)
+median_mlife = median(countries$Life_expectancy_at_birth_male_years,na.rm=TRUE)
+sd_mlife = sd(countries$Life_expectancy_at_birth_male_years,na.rm=TRUE)
+
+mean_flife = mean(countries$Life_expectancy_at_birth_female_years,na.rm=TRUE)
+median_flife = median(countries$Life_expectancy_at_birth_female_years,na.rm=TRUE)
+sd_flife = sd(countries$Life_expectancy_at_birth_female_years,na.rm=TRUE)
+
+mean_comp = mean(countries$Personal_computers_per_100_people,na.rm=TRUE)
+median_comp = median(countries$Personal_computers_per_100_people,na.rm=TRUE)
+sd_comp = sd(countries$Personal_computers_per_100_people,na.rm=TRUE)
+
+mean_phys = mean(countries$Physicians_per_1000_people,na.rm=TRUE)
+median_phys = median(countries$Physicians_per_1000_people,na.rm=TRUE)
+sd_phys = sd(countries$Physicians_per_1000_people,na.rm=TRUE)
+
+#This portion prints the stored values for each variable
+print("Life Expectancy") 
+mean_life
+median_life
+sd_life
+
+print("Male Life Expectancy") 
+mean_mlife
+median_mlife
+sd_mlife
+
+print ("Female Life Expectancy") 
+mean_flife
+median_flife
+sd_flife
+
+print ("Personal computers per 100 people")
+mean_comp
+median_comp
+sd_comp
+
+print ("Number of physicians per 1000 people")
+mean_phys
+median_phys
+sd_phys
+
+```
+
+a) Now that we have summaries for each variable we move on to plotting relationships between variables
+
+```{r}
+
+# Scater plot of Male life expectancy vs. Female life expectancy
+plot(countries$Life_expectancy_at_birth_male_years,countries$Life_expectancy_at_birth_female_years, main="Male life expectancy vs. Female life expectancy",
+     xlab = "Male Life Expectancy in Years", ylab = "Female Life Expectancy in Years", 
+     col.lab='purple', 
+     col.main = 'dark blue', 
+     cex.lab = 1.5, 
+     cex.main=1.5,
+     lwd = 2)
+abline(lm(countries$Life_expectancy_at_birth_female_years~countries$Life_expectancy_at_birth_male_years), 
+       col='red', 
+       lwd = 3, 
+       lty = "dotted")
+
+# Scatter plot of Personal computers vs. Total life expectancy
+plot(countries$Personal_computers_per_100_people,countries$Life_expectancy_at_birth_total_years, main="Personal Computers vs. Life Expectancy",
+     xlab = "Personal Computers per 100 People", ylab = "Life Expectancy in Years", 
+     col.lab='purple', 
+     col.main = 'dark blue', 
+     cex.lab = 1.5, 
+     cex.main=1.5,
+     lwd = 2)
+abline(lm(countries$Life_expectancy_at_birth_total_years ~ countries$Personal_computers_per_100_people), 
+       col='red', 
+       lwd = 3, 
+       lty = "dotted")
+
+# Scatter plot of Physicians vs. Total life expectancy 
+plot(countries$Physicians_per_1000_people, countries$Life_expectancy_at_birth_total_years, main="Physicians vs. Life Expectancy",
+     xlab = "Physicians per 1000 People", ylab = "Life Expectancy in Years", 
+     col.lab='purple', 
+     col.main = 'dark blue', 
+     cex.lab = 1.5, 
+     cex.main=1.5,
+     lwd = 2)
+abline(lm(countries$Life_expectancy_at_birth_total_years ~ countries$Physicians_per_1000_people), 
+       col='red', 
+       lwd = 3, 
+       lty = "dotted")
+
+
+```
+
+b) The relationship between personal computers and life expectancy is clearly not linear over this range. The relationship between life expectancy and number of physicians is relatively linear. Both are positive correlations. The linear approximation of the relationship for computers has a less steep slope(~10 years life expectancy / 20 computers per hundred people, or ~1 year life expectancy / 20 computers per thousand people) than the linear trendline for physicians (~5 years life expectancy / 1 physician per thousand people). Physicians and life expectancy have a stronger and more consistant correlation than computers and life expectancy. Computers only seem to have a correlation at very high concentrations. As ever, correlation does not imply causation, and it is not neccisarily true that either of these variables 'explain' life expectancy. 
+
+c) Now we will explore the relationship between continent and life expectancy. 
+
+```{r}
+# Boxplot of life expectancy by continent
+boxplot(countries$Life_expectancy_at_birth_total_years~countries$Continent,main="Life Expectancies by Continent", ylab="Life Expectancy in Years", las = 2)
+
+```
+
+Question 2. Blood Pressure Boxplot
+
+```{r}
+
+# Here we open the "BP" data file and view the variabe names
+
+BP <- read.csv("C:\\Users\\xenon\\Desktop\\R Studio 2018\\BP.csv")
+
+names(BP)
+
+# Boxplot of Systolic Blood Pressure by Village
+boxplot(BP$SBP~BP$Village,main="SBP by Village", ylab="SBP in mm/hg", las = 2, border = "dark green")
+
+
+```
+
+Question 3. Bootstrap Test
+
+a) First we will do a simple visualization of the data
+```{r}
+# Here we open the "bootstrap_test" data file and view the variabe names
+
+bootstrap <- read.csv("C:\\Users\\xenon\\Desktop\\R Studio 2018\\bootstrap_test.csv")
+
+names(bootstrap)
+
+# This creates a simple histogra of the values in bootstrap$X4
+hist(bootstrap$X4, main ="Bootstrap Histogram", breaks = 20)
+
+
+```
+b) Next, we will explore some quantitative properties of the data
+
+```{r}
+# Calculates the mean of bootstrap$X4
+mean_boot = mean(bootstrap$X4)
+
+# Calculates the 95% confidance interval of bootstrap$X4 using length(bootstrap$X4)-1 to express the degrees of freedom
+confidence <- qt(c(0.025,0.975),length(bootstrap$X4)-1)
+
+# Prints the values that we saved above
+print(mean_boot)
+print(confidence)
+
+```
+
+c) Now we will use bootstrap as an alternet means of calculating confidance intervals
+
+```{r}
+#creates an empty list that we will fill with simulated mean values
+bstrap<-c()
+#ensures that it is empty by calling it before the loop has run
+bstrap
+# Picks 149 values 1000 times, from the bootstrap$X4 data set- selections are made with repacement. 
+for(i in 1:1000){
+  bsample<-sample(bootstrap$X4,149,replace=T)
+  # saves generated list as a sample
+  bestimate<-mean(bsample)
+  # populates the originally empty list
+  bstrap<-c(bstrap,bestimate)}
+# calculate the quantiles of the bstrap
+quantile(bstrap,0.05)
+quantile(bstrap,0.95)
+quantile(bstrap,0.025)
+quantile(bstrap,0.975)
+
+```
+
+

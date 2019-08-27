@@ -1,0 +1,87 @@
+---
+title: "KJPipho_PS_6"
+author: "Krista Pipho"
+date: "October 8, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Question 1.
+Do Snail eating snakes have asymetrical teeth distribution. 
+
+```{r}
+#First we will import the snail eating data set.
+Snail_Snake <-read.csv("C:\\Users\\xenon\\Desktop\\R Studio 2018\\snail-eating snakes.csv")
+#Now we will visualize the data in a histogram to get a preliminary sense of whether it is normal.
+hist(Snail_Snake$Asymmetry.score)
+#At first glance this data does not look very normal.
+#Here we further examine the data using the density function.
+plot(density(Snail_Snake$Asymmetry.score))
+#When viewed using the density function, the data appears to be bimodal, without much seperation between the modes. Further examination will involve looking at the qqnorm plot of this data.
+qqnorm(Snail_Snake$Asymmetry.score)
+qqline(Snail_Snake$Asymmetry.score)
+#This method also shows what appears to be slight bimodality. Next we will perform a t-test to get a quantitative assessment of the data.Given that the assymetry score is right side tooth count minus left side tooth count, a symmetrical snake species would have a score of zero (due to having the same number of teeth on both sides.) Therefore our mu for this t test will be zero.
+Snail_Snake_Test<-t.test(Snail_Snake$Asymmetry.score,mu=0,var.equal=TRUE)
+Snail_Snake_Test
+
+```
+When we tested the data quantitatively, to see if the snake species included in the dataset were symmetrical, we received a p value which allows us to resoundingly reject Ho and conclude that snail eating snakes have an assymetrical number of teeth. 
+
+Despite the definitive answer we recieved, our certainty must be moderated by the fact that the t-test assumes a normal distribution, and our visual expolorations suggested  non-normal distribution of the data. 
+
+Question 2. 
+Are female moose lighter than male moose. 
+1) Ho : Mean (weight male moose) = mean (weight female moose)
+Ha : Mean (weight male moose) != mean (weight female moose)
+if mean (Weight male moose) > (weight female moose) then female moose weigh less than male moose. If (weight male moose) < (Weight female moose) then female moose weigh more than male moose.
+2) We will use the two subject t-test to obtain a numberical answer about whether the means are equal or not. A value of p < .05 will result in rejection of the null hyothesis.
+3) testing 
+```{r}
+#first we store the value for the male moose weight into the variable.
+weight_male_moose <- c(401,380,393,450,420,435,426,397,415)
+#then we store the value for the female moose weight into its variable
+weight_female_moose <-c(301,320,382,401,349,318,342,369)
+#we must know what the means of these samples are to interpret the data we get from the t-test, so we print these here.
+print("Mean of weight_male_moose")
+mean(weight_male_moose)
+print("Mean of weight_female_moose")
+mean(weight_female_moose)
+#now we run a t test using the two weight variables as the two subjects and asking if the means are the same.
+weight_t_test <- t.test(weight_male_moose, weight_female_moose, var.equal = TRUE)
+weight_t_test
+
+```
+4) We can see from the results of our code that the p-value is lower than .05, and we reject the null hypothesis. We know with high certainty that the two means are different, and when examining the means themselves, we observe that mean(weight_male_moose) > mean(weight_female_moose). We can conclude that female moose are lighter than male moose.
+
+Question 3. 
+A) Do the head size measurements taken with these two methods yield different results.
+  1) Ho : Mean (cardboard) = mean(metal)
+  Ha : Mean(cardboard) != mean(metal)
+  2) We will conduct a paired t-test. A p value of 0.05 or less will be enough to reject Ho. 
+  3) Perform Testing.
+```{r}
+#First we import the data and get a preliminary look at its structure.
+Noggins<-read.csv("C:\\Users\\xenon\\Desktop\\R Studio 2018\\NZNoggins.csv")
+Noggins
+#We use a paired t-test because the two values were obtained from the same subjects using different methods.
+Nog_Measurement <- t.test(Noggins$Cardboard.Calipers, Noggins$Metal.Calipers, paired = TRUE)
+Nog_Measurement
+```
+  4) The p value we obtained from the paired t test was less than .05 , and therefore we conclude that the metal calipers yield a different measurement than the cardboard calipers.
+3B)
+
+```{r}
+#The power test will require us to pool the standard deviations of the two samples. First we will find the sd.
+sd_metal<-sd(Noggins$Metal.Calipers)
+sd_cardboard<-sd(Noggins$Cardboard.Calipers)
+#Then we will pool them using the equation shown in lecture 6, modified for the larger n
+pooled_sd_calipers<-sqrt((17*(sd_metal^2)+17*(sd_cardboard^2))/(34))
+#To answer this question we will use the power function and feed in arguments denoting that our values are paired, the desired resolution, a desired power level describing our surety in the conclusion. 
+power.t.test(delta=0.2,sd=pooled_sd_calipers,power=0.9)
+
+
+```
+We have found that the required n is 16957. 

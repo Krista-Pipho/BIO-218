@@ -1,0 +1,176 @@
+---
+title: "KJPipho_PS_4"
+author: "Krista Pipho"
+date: "September 22, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Question 1.
+
+Has the storm driven stabilizing selection on the humerus length in this population?
+
+```{r}
+# First we open the bumpus data set and save it as 'bumpus'
+bumpus <- read.csv("C:\\Users\\xenon\\Desktop\\R Studio 2018\\bumpus.csv")
+
+# Next we will view summary statistics of all humerus length values. 
+summary(bumpus$length.humerus.in.)
+sd_total <-sd(bumpus$length.humerus.in.)
+print(sd_total)
+```
+Considering all of the humorus length values shows us the variation in the population as it existed before the storm. To answer our question we must divide the data by survival outcome.
+
+```{r}
+# Here we subset the data into observations from surviving individuals, 'survived', and observations from deceased individuals, 'died'. 
+survived <-subset(bumpus, bumpus$survival == TRUE)
+died <-subset(bumpus, bumpus$survival == FALSE)
+
+# This will print statistics for the surviving subset
+print("Survived")
+summary(survived$length.humerus.in.)
+sd_survived <- sd(survived$length.humerus.in.)
+print(sd_survived)
+
+# This will print statistics for the deceased subset
+print("Died")
+summary(died$length.humerus.in.)
+sd_died <- sd(died$length.humerus.in.)
+print(sd_died)
+
+# This will create a boxplot comparing surviving and deceased individuals. 
+boxplot(bumpus$length.humerus.in.~bumpus$survival, main="Survival and Humerus Length", border="purple", ylab = "Humerus Length in Inches")
+
+```
+
+We can apprehend visually that survivors of the storm have a narrower range of humerus lengths than the group of individuals that died, and have a distribution tending more towards longer lengths.
+
+Numerically we see that every summary value is higher for the survivors than for the deceased group, except for standard deviation, which is appreciably lower. The surviving population exhibits a ~.003 inch decrease in standard deviation, which suggests that the storm may have exerted stabilizing selection on humerus length in this population. 
+
+Question 2. 
+
+Is there a difference in humerus length variance between males and females?
+
+```{r}
+# This will compute variance by sex
+print("Standard deviation and summary statistics of humerus length for female(f) and male(m) sparrows")
+tapply(bumpus$length.humerus.in.,bumpus$sex,sd)
+
+# This will give sumary statistics by sex
+tapply(bumpus$length.humerus.in.,bumpus$sex,summary)
+
+# This will create a boxplot illustrating humerus length by sex
+boxplot(bumpus$length.humerus.in.~bumpus$sex, main="Variation in Humerus Length by Sex", ylab="Humerus Length in Inches")
+```
+
+Males appear to have slightly more variance in humerus length and slightly longer humerus lengths on average. 
+
+Question 3. 
+
+Were juvanile and adult males equally likely to survive the storm?
+
+  1. Hypothesis
+      Ho: p (juvenile males surviving) = p (adult males surviving)
+      Ha: p (juvenile males surviving) =! p (adult males surviving) 
+  2. Testing
+      Binomial test (assumes two mutually exclusive outcomes, random sampling)
+      Equal Proportions test
+  3. Alpha  
+      We want an alpha = .05, so we set the confidance interval to .95
+
+```{r}
+# Here we find the total numbers of male observations
+Num_Male <- sum(bumpus$sex=='m')
+Num_AM <- sum(bumpus$age=='a')
+Num_JM <- sum(bumpus$age=='y')
+print("Total Males")
+print(Num_Male)
+print("Total Adult Males")
+print(Num_AM)
+print("Total Juvanile Males")
+print(Num_JM)
+
+# Here we find the raw numbers of young and adult males that died / survived
+AM_Survival <- sum(bumpus$survival==TRUE&bumpus$age=="a")
+print("Adult Males Survided ")
+print(AM_Survival)
+JM_Survival <- sum(bumpus$survival==TRUE&bumpus$age=="y")
+print("Juvanile Males Survived ")
+print(JM_Survival)
+AM_Death <- sum(bumpus$survival==FALSE&bumpus$age=="a")
+print("Adult Males Died ")
+print(AM_Death)
+JM_Death <- sum(bumpus$survival==FALSE&bumpus$age=="y")
+print("Juvanile Males Died ")
+print(JM_Death)
+
+# Making sure the categories add up to the total
+Check_AJM <- sum(AM_Survival,AM_Death,JM_Survival,JM_Death)
+print("Check to see it all adds up")
+print(Check_AJM)
+
+# Binomial test on both groups
+AM_Prop_bin <-binom.test(AM_Survival,Num_AM,p=0.5,alternative="two.sided",conf.level = 0.95)
+print("Proportion Adult males Surviving")
+print(AM_Prop_bin)
+JM_Prop_bin <-binom.test(JM_Survival,Num_JM,p=0.5,alternative="two.sided",conf.level = 0.95)
+print("Proportion Juvenile males Surviving")
+print(JM_Prop_bin)
+
+# Equal proportions test on both groups
+AM_Prop_prop <-prop.test(AM_Survival,Num_AM,p=0.5,alternative="two.sided",conf.level = 0.95)
+print("Proportion Adult males Surviving")
+print(AM_Prop_prop)
+JM_Prop_prop <-prop.test(JM_Survival,Num_JM,p=0.5,alternative="two.sided",conf.level = 0.95)
+print("Proportion Juvenile males Surviving")
+print(JM_Prop_prop)
+
+```
+
+  
+  4. Conclude
+    For the binomial test, the probability of adult male survival, 0.5932203, falls within the 95%         confidance interval for juvanile male survival (0.3717936 0.7553761). Likewise the probability of      juvanile male survival, 0.5714286, falls within the 95% confidance interval for adult male             survival (0.4574519 0.7193038). 
+    For the equal probability test, the probability of adult male survival, 0.5932203, falls within the     95% confidance interval for juvanile male survival (0.3743185 0.7497305). Likewise the probability     of juvanile male survival, 0.5714286, falls within the 95% confidance interval for adult male          survival (0.4576220 0.7166757) 
+    Neither of these tests provide us with grounds to reject the null hypothesis, so we accept Ho. 
+    
+    The p-value obtained from binomial test was 0.1925 for adult males and 0.5716 for juvanile males
+    The p-value obtained from proportions test was 0.193 for adult males and 0.5708 for juvanile males
+    This means that there is no clear trend for which p-value is smaller and better. These tests have      disperate underlying mechanics but as expected perform somewhat comperably and are both valid          explorations of the data.  
+
+Question 4. 
+What is the probability of having 84 or fewer heads in 1000 coin flips?
+
+We will use a function of our own writing, along with an rbinom function to test this.
+
+
+```{r}
+
+# Defines how many times to repeat our simulation
+runs <- 100000
+# New function that sums up the number of times that less than 85 (84 or less) heads appears in the simulation of 1000 coin tosses
+one.trial <- function(){
+#use sample to create one iteration of 1000 coin tosses add it to arunning total with sum function if less than 85 heads
+# If return FALSE add 0 instead of 1
+sum(sample(c(0,1),1000,replace=TRUE))<85
+}
+#summing up each trial over the 100000 runs and dividing by number of runs to get probabuility
+mc.binom<-sum(replicate(runs,one.trial()))/runs
+mc.binom
+```
+
+It seems that the porbabuility of this occurance is too small to be detected by this method. Let us try a secondary method;
+
+```{r}
+
+# Generates 1000 coin tosses 100000 times to see how many heads appear in each of the 100000 simulations
+rbin_exam<-rbinom(100000,size=1000,prob=0.5)
+# We can visualize the results of this in a histogram
+hist(rbin_exam)
+
+
+```
+
+Using a histogram we can see that 84 or less heads is very very very far from the trailing left end of the bell curve. This event is so unlikely as to never appear in 100,000 trials. Both methods give us this result because the asked for result is definitively too unlikely to reliably ever observe in 100000 trials, and that is the number of repetitions used in both methods. 

@@ -1,0 +1,105 @@
+---
+title: "KJPipho_PS_2"
+author: "Krista Pipho"
+date: "September 8, 2018"
+output: html_document
+---
+
+Question 1. Telomeres
+
+```{r}
+# First we open the Telomeres file
+telo <- read.csv("C:\\Users\\xenon\\Desktop\\R Studio 2018\\TELOMERES.csv")
+telo
+```
+After loading this file we can check the variable types.
+
+```{r}
+# We can test them manually
+is.numeric(telo$years)
+is.numeric(telo$telomere.length)
+
+# We can see that both variables are numeric, but must probe further to find the exact type
+is.integer(telo$years)
+is.double(telo$years)
+is.integer(telo$telomere.length)
+is.double(telo$telomere.length)
+
+# Alternatively, we can have it return class types of variables directly
+class(telo$years)
+class(telo$telomere.length)
+
+```
+
+From this we can see that class() is more efficient, but sometimes has limited precision (returning "numeric" rather than "double")
+
+
+Once we know that both of our variables are numeric we can choose the best visualization strategy. For two quantitative variables, scatter plots are a good place to start. 
+
+```{r}
+
+plot(telo$years,telo$telomere.length, main="Child Illness Duration vs. Parental Telomere Length",
+     xlab = "Years of Illness", ylab = "Telomere Length", 
+     col.lab='dark green', 
+     col.main = 'purple', 
+     cex.lab = 1.5, 
+     cex.main=1.5,
+     lwd = 2)
+abline(lm(telo$telomere.length~telo$years), 
+       col='red', 
+       lwd = 3, 
+       lty = "dotted")
+
+```
+
+Using a trend line we can easy see a modest correlation between increased child illness duration and decreased parental telomere lengths. 
+
+Question 2. Firefly Spermatophores
+
+Because the data from Whitlock and Schluter (edition 2), Chapter 2: Q19 (Page 58) is not already contained in a file we must manually input the values to a dataframe. 
+
+
+```{r}
+
+# We name the dataframe 'weights' because the data are weights in milligrams
+
+weights <- c(0.047, 0.037, 0.041, 0.045, 0.039, 0.064, 0.064, 0.065, 0.079, 0.070, 0.066,
+0.059, 0.075, 0.079, 0.090, 0.069, 0.066, 0.078, 0.066, 0.066, 0.055, 0.046,
+0.056, 0.067, 0.075, 0.048, 0.077, 0.081, 0.066, 0.172, 0.080, 0.078, 0.048,
+0.096, 0.097)
+
+weights
+
+```
+
+
+Here we have only one numerical variable. A histogram is an appropriate plot for displaying the frequency distribution of this data. 
+
+```{r}
+hist(weights, main="Weights of Spermatophores in Milligrams")
+
+```
+
+The distribution looks roughly normal, with most values falling between 0 and .1 mg. There is, however, one outlier of substantially higher mass. 
+
+
+
+Question 3. Using ggplot2
+
+Remaking the scatter plot from question 1 with ggplot2
+
+```{r}
+library(ggplot2)
+ggplot(data = telo) + geom_point(mapping = aes(x = telo$years,y = telo$telomere.length),color = "blue") +labs(title =" Child Illness Duration vs. Parental Telomere Length", x = "Years of Illness", y = "Telomere Length") + geom_smooth(method = "lm",aes(x= telo$years,y=telo$telomere.length))
+
+
+```
+
+Remaking the histogram from question 2 with ggplot2
+
+```{r}
+ggplot() + geom_histogram(binwidth=.01, mapping = aes(x = weights), color='blue')+labs(title="Weights of Spermatophores in Milligrams")
+
+```
+
+

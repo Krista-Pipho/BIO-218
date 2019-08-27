@@ -1,0 +1,113 @@
+---
+title: "KJPipho_PS_5"
+author: "Krista Pipho"
+date: "September 30, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Question 1. 
+
+Are Ts in common and uncommon words equally perceptible? We will test this by assessing T finding while reading a passage. 
+
+a) Ho : p(Finding Ts in common words) = p(Finding Ts in uncommon words)
+
+If common words contain 28 out of the 94 Ts in the passage we would expect mistakes in common words to comprise 28/94ths of the total mistakes. 
+
+b) My results are as follows:
+
+Ts found in common words: 15
+Ts missed in common words: 13
+Ts found in uncommon words: 53
+Ts missed in uncommon words: 13
+
+```{r}
+# Input my results into 'results'
+results <- c(15,53,13,13)
+# Format 'results' to have 2 rows and 2 columns
+dim(results) = c(2,2)
+results
+# Naming columns in 'results'
+colnames(results) <- c("Correct", "Incorrect")
+# Naming rows in 'results'
+rownames(results) <- c("Common", "Uncommon")
+# Making 'results' be of the type 'table'
+results <- as.table(results)
+
+# Performing chi square analysis on results and 'parking it' as results.chi 
+results.chi <- chisq.test(results)
+# Print results of chi sq
+results.chi
+print ("Observed")
+results.chi$observed
+print ("Expected")
+results.chi$expected
+
+# Make mossaic plot to visualize relationship
+mosaicplot(results, main = "Detection of Ts", col = c("Light Green", "Pink"))
+
+
+
+```
+It appears that we must reject Ho and accept that Ts are more likely to go unnoticed when situated in common words. 
+
+Question 2.
+
+Do chipmunks trill differently under different circumstances?
+
+Ho : p(trill,near) = p(trill,far)
+Ha : p(trill,near) != p(trill,far)
+
+```{r}
+# Placing data in Chipmonk_Trill
+Chipmunk_Trill <- c(16,8,3,18)
+# Setting dimensions
+dim(Chipmunk_Trill) <- c(2,2)
+# Making Chipmonk_Trill a 'table' type
+Chipmunk_Trill <- as.table(Chipmunk_Trill)
+# Naming columns
+colnames(Chipmunk_Trill) <- c("Trill", "No Trill")
+# Naming rows
+rownames(Chipmunk_Trill) <- c("10m", "100m")
+# Printing the table
+Chipmunk_Trill
+# Making a mosaic plot of the table
+mosaicplot(Chipmunk_Trill, main = "Differential Trills", color = c("light blue", "gray"))
+
+# Performing Fisher test
+Chipmunk_Trill.Fisher <- fisher.test(Chipmunk_Trill)
+# Printing test results
+Chipmunk_Trill.Fisher
+
+```
+Conclusion : We reject the null hypothesis and conclude that chipmunks are more likely to trill when close to their burrow
+
+Question 3.
+
+Does nesting site affect penguin survival?
+
+Ho : p(alive,lower) = p(alive,middle) = p(alive,upper)
+Ha : p(alive,lower) != p(alive,middle), or p(alive,lower) != p(alive,upper) or p(alive,middle) != p(alive,upper)
+
+```{r}
+# Placing data in Penguin_Survival
+Penguin_Survival <- c(43,44,49,7,6,1)
+# Setting dimensions for the data matrix
+dim(Penguin_Survival) <- c(3,2)
+# Naming the columns
+colnames(Penguin_Survival) <- c("Alive", "Dead")
+# Naming the rows
+rownames(Penguin_Survival) <- c("Lower", "Middle", "Upper")
+# Printing the matrix
+Penguin_Survival
+# Making a mosaicplot of the data
+mosaicplot(Penguin_Survival, main = "Penguin Survival", color = c("light green", "red"))
+
+# Performing fisher test
+Penguin_Survival.Fisher <- fisher.test(Penguin_Survival)
+# Printing test results
+Penguin_Survival.Fisher
+```

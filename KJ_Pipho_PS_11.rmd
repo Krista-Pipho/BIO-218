@@ -1,0 +1,121 @@
+---
+title: "KJ_Pipho_PS_11"
+author: "Krista Pipho"
+date: "December 6, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Question 1. 
+  Write a function that takes one number and raises it to the power of a second
+number
+
+```{r}
+# This line defines the function, which takes arguments x and y, then raises x to the power of y
+my_powers <- function(x,y) {x^y}
+# This line feeds my_powers the aruments 3 and 4, storing the result in 'result'
+result <- my_powers(3,4)
+# Here we print the result
+print(result)
+```
+
+Question 2. 
+  Write a function that multiples at least three numbers that you pass it as
+arguments and that has at least one default value. 
+
+```{r}
+# This line defines the function with four arguments, including z which has a default value of 5. The function multiplies all of these arguments together and returns a product. 
+my_product <- function(w,x,y,z = 5){w*x*y*z}
+# This line calls the function and saves the result as result_2
+result_2 <- my_product(2,3,4)
+#This line prints result_2
+print(result_2)
+
+```
+
+Question 3. 
+Call the following with an anonymous function that adds 1 to a variable, x:
+evaluate <- function(func, dat){return(func(dat))}
+
+```{r}
+# Calls the original function with an anonymous that adds 1 to the argument
+evaluate <- function(func, dat){return(func(dat))}
+found <- evaluate(function(x){x+1},6)
+print(found)
+
+```
+
+Question 4. 
+  We accidentally failed to comment our code! Predict what the following code will
+do and add commentary to it to let your end user know what it does. (Note: You
+will want to confirm that the code works the way you think it should by executing
+it in an R chunk but it is more valuable of an exercise if you try to think through it
+prior to executing it.)
+
+```{r}
+# Generate a vector of length 100 populated with zeros as placeholders
+myMeans<-vector("numeric", length=100)
+# This should print out 100 zeros if the code worked
+print(myMeans)
+# Iterate across the vector
+for (i in 1:100){
+# Generate a random value centered around 0.5. 10 indicates that the program should average 10 values selected with standard probability from around 0.5.
+x<-runif(10)
+# Overwrite the value you have iterated to with your loop.
+myMeans[i]<-mean(x,na.rm=TRUE)
+}
+#See the results.
+print(myMeans)
+
+```
+
+Question 5. 
+  Use a higher order function to create a vector that multiplies each element by
+itself. Print out the resulting vector to the screen.
+
+```{r}
+# Makes a vector with values from 1 to 100
+square<-c(1:100)
+# Prints that vector
+print(square)
+# Defines a function that multiplies values by themselves, and feeds it into the higher order function map to call the function on every value in the vector, storing the result in square_vector
+square_vector <- Map({function(k) k*k},square)
+# Unilists square vector so that it is in regular vector form again
+unlist(square_vector)
+
+```
+
+Question 6. 
+  Write out three ways of creating a vector that only contains the even numbers
+between 0 and 20 (one of these three ways should contain a higher order function,
+a second should use a built in function but you should define your own function
+for the third way).
+
+```{r}
+# This method utilizes the higher order function Filter
+small.even.numbers<-Filter(function (x) {x %% 2 == 0}, 1:20)
+print(small.even.numbers)
+
+# This method uses a built in function called seq
+small_even_2<-seq(2,20, by = 2)
+print(small_even_2)
+
+# This is a method I created that provides a third way to generate a list of small even numbers
+# Defines func, which takes one number and one vector as arguments 
+func <- function(x,a){
+  # Makes a loop with as many itterations as the numerical argument
+  for (i in 1:x)
+  # Only appends the number of the itteration to the vector if that number is even by mod 2
+  {if (i %% 2 == 0) {a <- c(a,i)}}
+# Returns the now full vector
+return(a)}
+# Initializes an empty vector
+a <- c()
+# Calls func with the empty vector and 20
+small_3 <- func(20,a) 
+# Prints the result
+print(small_3)
+```

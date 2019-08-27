@@ -1,0 +1,93 @@
+---
+title: "KJPipho_PS_9"
+author: "Krista Pipho"
+date: "November 8, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Question 1. 
+
+Do mammals obey a common law of allometric scaling for brain size?
+
+a)
+```{r}
+# First we read in the mammal data set and save it as "mammal" 
+mammals<-read.csv( "C:\\Users\\xenon\\Desktop\\R Studio 2018\\mammals.csv")
+# Now we look over the data
+#mammals
+# Next we plot brain size against body size to see if they have a linear relationship to eachother
+plot(mammals$body.mass..kg.,mammals$brain.mass..g., main= "Scaling of brain size with body size", pch=9)
+```
+The relationship of the two variables is probably not linear, but its hard to tell visually with all of the points clustered at the bottom.
+
+b) What if we log transform the data?
+```{r}
+# Here we log trandform both sets of weights
+log_br = log(mammals$brain.mass..g.)
+log_bo = log(mammals$body.mass..kg.)
+# Here we formally test the normality of each transformed varriable 
+shapiro.test(log_bo)
+shapiro.test(log_br)
+# We can visualize the new shape of the distribution using a density plot
+plot(density(log_bo),col="red")
+# This appears normal enough
+# We check for outliers using a boxplot
+boxplot(log_bo)
+# Witht his transformation there are no outliers in the proposed predictor variable
+# Now we can replot with the transformed data
+plot(log_bo,log_br,main= "Log transformed values")
+# We can also visualize this even better with a qq plot
+qqplot(log_bo,log_br, main = "qq plot of Body mass vs Brain mass")
+```
+
+The correspondance between brain and body size certainly looks linear when they are both log transformed!
+
+c) Now we will examine the correaltion between the two variables
+
+```{r}
+
+# Here we will use a correlation test to get a preliminary idea of the correlational relationship between thesetransformed variables
+cor.test(log_bo,log_br)
+cor.test(log_bo,log_br, method = "spearman")
+# The two seem to have a very strong (.96 out of a totoal of 1 possible) positive correlation 
+```
+
+With pearsons, the correlatin found is slightly higher (.959) than with spearman (.953). Because we meet the assumptions for pearson we can use this more accurate method, while spearman is designed for dealing with various violations and would be expected to give a more conservative estimate of the correlation. 
+
+d) Now we will make a linear model for this correlation using regression
+
+```{r}
+
+line_mod_bobr <- lm(log_br~log_bo)
+print(line_mod_bobr)
+summary(line_mod_bobr)
+
+plot(log_bo,log_br,main= "Log transformed values with line")
+abline(line_mod_bobr)
+
+```
+
+The line that best describes the correlation between the log of brain and body size in mamals is  y = .75x + 2.13
+
+e) Lets look at the residual plots now
+```{r}
+# We will make a comparasin of brain size to body side
+body_brain_lm <-lm(mammals$brain.mass..g.~ mammals$body.mass..kg.)
+# Now we will look at the residuals using the resid function
+body_brain.resid<-resid(body_brain_lm)
+plot(body_brain.resid, ylim = c(-1000,2500))
+text(body_brain.resid, labels=mammals$name, cex=0.4, pos=3)
+# we expect no slope with residuals so we plot a plain, straight line for comparasin
+abline(0,0)
+
+
+```
+From this we can dicern that the mammal witht he largest brain for its body are asian elephants, and the mamal with the smallest brain for its body are african elephants.
+
+f) Humans have a significantly positive residual, thus have brains larger than expected for our body size. The african and asian elephants are also outliers. 
+
+

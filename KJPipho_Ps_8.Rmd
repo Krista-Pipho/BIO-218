@@ -1,0 +1,64 @@
+---
+title: "KJPipho_PS_8"
+author: "Krista Pipho"
+date: "October 30, 2018"
+output: html_document
+---
+
+Question 1. 
+Do cuckoo birds lay differetn size eggs in the nests of different bird species? 
+
+```{r}
+# First we load in the cuckooeggs data set and save it as cuckooEggs
+cuckooEggs <- read.csv("C:\\Users\\xenon\\Desktop\\R Studio 2018\\cuckooeggs.csv")
+# We print out the titles of the data variables
+names(cuckooEggs)
+# Here we make a box plot of egg length by host species
+plot(cuckooEggs$Egg.Length~cuckooEggs$Host.Species)
+# Nothing looks crazy wrong with the box plot,we ca check a qqnorm plot tobetter visualize weather the data is normal
+qqnorm(cuckooEggs$Egg.Length)
+qqline(cuckooEggs$Egg.Length)
+# The data appears quite normal, let us formally check using the shapiro test
+stestCE <- shapiro.test(cuckooEggs$Egg.Length)
+stestCE
+# The p value is not low enough to reject that the data is normal. Let us test weather the variance is equal
+btestCE <- bartlett.test(cuckooEggs$Egg.Length~cuckooEggs$Host.Species)
+btestCE
+# The p value is not low enough to reject that the variances are equal. Since both the assumption of normality and the assumption of equal variance are met we can procede with the ANOVA analysis
+cuckooEggsAnova <- aov(cuckooEggs$Egg.Length~cuckooEggs$Host.Species)
+cuckooEggsAnova
+summary(cuckooEggsAnova)
+TukeyHSD(cuckooEggsAnova)
+
+```
+We can see statistically significant differences in egg length between the eggs laid in Meadow Pipit vs Hedge Sparrow nests, between Wren and Hedge Sparrow nests, between tree pipit and meadow pippit nests, between wren and meadow pippit nests, between wren and pied wagtail nests, between wren and robin nests, and between wren and tree pippit nests. This shows that there are many instances of egg size vairance depending on host species. 
+
+Question 2. 
+Can circadian disruptions affect robustness to infections?
+
+```{r}
+# First we load in the circadian mutant health data set and save it as circadian
+circadian<-read.csv("C:\\Users\\xenon\\Desktop\\R Studio 2018\\circadian mutant health.csv")
+# Next we print out the variable names for the data set
+names(circadian)
+# Then we do an initial visualization via boxplot of survival time by mutation condition
+plot(circadian$Time.to.death..days.~circadian$Genotype)
+# There appear to be low levels of outlier and differences in mean, but lets check if the data is normal
+stestCIRC <- shapiro.test(circadian$Time.to.death..days.)
+stestCIRC
+# The data is unfortunately not normal, so lets log transform it and retest for normality
+circadianLog <- log(circadian$Time.to.death..days.)
+plot(circadianLog~circadian$Genotype)
+shapiro.test(circadianLog)
+# The data is still not normal. What if we transform with sqrt +.5 transformation and retest?
+circadianRoot<-sqrt(circadian$Time.to.death..days.+0.5)
+stestROOTCIRC <- shapiro.test(circadianRoot)
+stestROOTCIRC
+# The data is stillll not normal. SO we will abandon ANOVA as an analysis option, and use the kruskal wallis test instead. 
+kwTestCircadian <- kruskal.test(circadian$Time.to.death..days.~circadian$Genotype)
+kwTestCircadian
+summary(kwTestCircadian)
+
+```
+
+Using the Kruskal Wallis test we find with high certianty (Very low p value) that at least one of the groups has a significantly different mean. With a one way test we cannot tell which group or groups is different, onlt that at least one is. Regardless, we can now say that circadian rhythum health can directly exert an effect on survival of infections in fruit flies. 

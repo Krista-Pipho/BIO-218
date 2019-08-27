@@ -1,0 +1,89 @@
+---
+title: "KJPipho_PS_1"
+author: "Krista Pipho"
+date: "September 1, 2018"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+RStudio Fall 2018
+
+Problem Set 1
+
+1. HairEyeColor
+
+How many people are included in this data set?
+
+```{r}
+HEC <- HairEyeColor
+sum(HEC)
+```
+
+What are the male/female proportions of these 592 people?
+
+```{r}
+prop.table(apply(HEC, c(3), sum))
+```
+
+What proportions are the hair and eye colors present in?
+
+```{r}
+"Hair"
+prop.table(apply(HEC, c(1), sum))
+"Eye"
+prop.table(apply(HEC, c(2), sum))
+```
+
+Are there large differences in hair and eye color frequencies between males and females?
+
+```{r}
+mosaicplot(~Sex+Hair, data=HEC, col=c("Black","chocolate4", "red","Yellow"), main = "Hair Color By Sex")
+mosaicplot(~Sex+Eye, data=HEC, col=c("chocolate4","light blue", "darkgoldenrod1","green"), main = "Eye Color by Sex")
+```
+
+There do not appear to be large differences between the sexes. 
+
+Do hair and eye color sort independantly? 
+
+```{r}
+a <-prop.table(apply(HEC, c(1), sum))
+b <-prop.table(apply(HEC, c(2), sum))
+chisq.test(a,b)
+```
+The Chi Square value for Hair/Eye is .2133
+This is less than .5, so an association seems to exist, but more than .05 so the certainty of an association is low. 
+
+Can we visualize which hair and eye colors are most likely to co-occur using a mosaic plot?
+
+```{r}
+mosaicplot(~Hair+Eye, data=HEC, col=c("chocolate4","light blue", "darkgoldenrod1","green"), main= "Frequency of Hair Color / Eye Color Co-Occurance")
+```
+
+It appears that (black hair / brown eyes) and (blond hair, blue eyes) are the most readily associated combinations. 
+
+2. Bat Tongues
+
+
+```{r}
+Bat<-read.csv("C:\\Users\\xenon\\Desktop\\R Studio 2018\\bat tongues.csv")
+
+plot(Bat$Palate.length.mm.,Bat$Tongue.length..mm., main="Palate Length vs. Tongue Length",
+     xlab = "Palate", ylab = "Tongue", 
+     col.lab='dark green', 
+     col.main = 'purple', 
+     cex.lab = 1.5, 
+     cex.main=1.5,
+     lwd = 2)
+abline(lm(Bat$Tongue.length..mm. ~ Bat$Palate.length.mm.), 
+       col='red', 
+       lwd = 3, 
+       lty = "dotted")
+
+```
+
+

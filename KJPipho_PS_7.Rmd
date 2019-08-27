@@ -1,0 +1,128 @@
+---
+title: "KJPipho_PS_7"
+author: "Krista Pipho"
+date: "October 26, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Question 1. 
+How robust are two sample t tests to violations of assumptions?
+
+T tests assume normality and equality of variance. The robustness of the test describes how much violations of those assumptions change the likelyhood of type 1 or type 2 errors. Robustness can also depend on sample size and integrety of the data collection. 
+
+```{r}
+# Here we input a number of data sets, either randomly generated or explicetly specified. We know that all should have a mean of zero. 
+small_norm<-rnorm(5,0,1)
+small_var<-rnorm(5,0,10)
+large_norm<-rnorm(500,0,1) 
+large_var<-rnorm(500,0,10)
+Left_skew <- c(0.80,1.3,-0.58, 0.30,0.50)
+Right_skew <- c(-0.84,-0.015,-0.74,0.31,-0.26)
+```
+
+One assumption is that the two samples will have equal variance
+```{r}
+# Here we use both the Welch and two sample t tests to compare small data sets. These two have different variances, violating the equality of variance assumption
+
+t.test(small_norm,small_var, var.equal = FALSE)
+t.test(small_norm,small_var, var.equal = TRUE)
+```
+Using the Welch test we get a p value of .06703, greater than .05. We avoid erroniously rejecting the null hypothesis, but just barely. 
+
+Using the regular t-test (var.equal = TRUE) we get a p value of .03993, less than .05. Violation of the equality of variance assumption has led us to falsely reject the null hypothesis 
+
+Does size of the data set play a role in sensitivity to this violation?
+```{r}
+# Here we use both the Welch and two sample t tests to compare larger data sets. These also have different variances, violating the equality of variance assumption
+t.test(large_norm,large_var, var.equal = FALSE)
+t.test(large_norm,large_var, var.equal = TRUE)
+```
+Using these much larger data sets the p-values for the two tests are much higher. The difference in variance is less dangerous with the larger sample. Nearly all of the returned values (including canfidance intervals and sample estimates) are virtually identical between the two tests. The advantage of the Welch test dissapears as the sample grows larger. 
+
+
+Another assumption is that the samples are both normally distributed 
+```{r}
+# Here we use both the Welch and two sample t tests to compare skewed data sets. One is skewed left, the other right. This setup violates the assumption of normality
+
+t.test(Left_skew,Right_skew, var.equal = FALSE)
+t.test(Left_skew,Right_skew, var.equal = TRUE)
+```
+Again, both p values are worryingly close to .05. Neither actually causes an eronious rejection of the null. In this case, the p value for the Welch test is higher than that for the two sample test. The Welch test may have a slight advantage in robustness to violation of the normality assumption.
+
+
+Question 2. 
+
+Are the brain sizes of mammals normally distributed? 
+
+a.
+```{r}
+# Reads in the mammal data set and saves it as mam
+mam <- read.csv("C:\\Users\\xenon\\Desktop\\R Studio 2018\\mammals.csv")
+
+# Draws a histogram of the brain mass values
+hist(mam$brain.mass..g.)
+```
+At a glance this does not appear normally distributed. Lets look at the qq plot to see how well it matches a normal distribution, and do a formal test for normality with shapiro. 
+
+b.
+```{r}
+# Draws the qq plot and a line representing the ideal perfect match to a normal distribution
+qqnorm(mam$brain.mass..g.)
+qqline(mam$brain.mass..g.)
+
+# Performs a shapiro formal test of normality. 
+shapiro.test(mam$brain.mass..g.)
+```
+
+The distribution deviates wildly from normal at the right of the graph, getting very large. This does not look like a normal distribution because it is not linear.The p value of the wilk test is miniscule, and we can confidantly reject the null hypothesis of a normal distribution.Both examinations tell us the same thing. How can we transform the data to make it mor normal? The deviation appears exponential, so we can try a log transform. 
+
+c.
+```{r}
+# Log transforms the brain mass values
+log_brain <- log(mam$brain.mass..g.)
+# Makes a histogram of the transformed values
+hist(log_brain)
+
+# Creates a qq plot to visualize how it compares to the line of an ideal normal distribution 
+qqnorm(log_brain)
+qqline(log_brain)
+
+# Performes a formal test of normality
+shapiro.test(log_brain)
+
+```
+The new distribution appears normal both in a histogram and a normal qq plot. The formal test of normality yeilds a p value of .697, which is greater than .05. this means we cannot reject the null hypothesis that it is normal. 
+
+Question 3.
+
+In PS4 I investigated Humorous length. Is the variance equal between the male humorus length set and the female humorus length set?
+```{r}
+# Reads in the bumpus data and saves it as bumpus
+bumpus <- read.csv("C:\\Users\\xenon\\Desktop\\R Studio 2018\\bumpus.csv")
+
+# Subsets the bumpus data into a male set and a female set
+Male <- subset(bumpus, bumpus$sex == "m")
+Female <- subset(bumpus, bumpus$sex == "f")
+
+# Uses a two sample t-test to see if the varriances are equal between the humerus lengths in these groups
+t.test(Male$length.humerus.in.,Female$length.humerus.in.,var.equal = TRUE)
+
+```
+p-value is .06178 which is greater than .05. We cannot reject the null hypothesis that viariance is equal between male and female humorus length. 
+
+Question 4. 
+Is the distribution of snake tooth assymmetry scores normally distributed?
+
+```{r}
+# Reads in the snake data set and saves it as SES
+SES <- read.csv("C:\\Users\\xenon\\Desktop\\R Studio 2018\\snail-eating snakes.csv")
+
+# Performes a formal test of normality on the assymmetry score data
+shapiro.test(SES$Asymmetry.score)
+```
+We cannot reject the null hypothesis that this data is normally distributed. 
